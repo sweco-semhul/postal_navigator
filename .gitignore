@@ -1,3 +1,17 @@
 .DS_Store
 dist
 node_modules
+src/vendor/ffwdme/demo
+src/vendor/ffwdme/demo_mapboxgljs
+src/vendor/ffwdme/posten_test
+src/vendor/ffwdme/recorded_routes
+src/vendor/ffwdme/vendor
+src/vendor/ffwdme/index.html
+src/vendor/ffwdme/posten_test.html
+src/vendor/ffwdme/simple_recorder.html
+src/vendor/ffwdme/app.js
+src/vendor/ffwdme/credentials.js
+src/vendor/ffwdme/credentials_example.js
+src/vendor/ffwdme/demo.css
+src/vendor/ffwdme/demo.html
+src/vendor/ffwdme/demo_mapboxgljs.html
