@@ -42,7 +42,7 @@ class PostalNavigator {
 
           // experimental
           //  mapRotator: new ffwdme.components.MapRotator({ map: map }),
-            zoom      : new ffwdme.components.Zoom({ map: map, parent: '#playground', grid: { x: 3, y: 3 }}),
+          //  zoom      : new ffwdme.components.Zoom({ map: map, parent: '#playground', grid: { x: 3, y: 3 }}),
            //overview  : new ffwdme.components.RouteOverview({ map: map, parent: '#playground', grid: { x: 2, y: 2 }}),
 
           // debugging
