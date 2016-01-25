@@ -1544,6 +1544,9 @@ var OSRM = Base.extend({
     this.bindAll(this, 'parse', 'error');
 
     this.apiKey = ffwdme.options.OSRM ? ffwdme.options.OSRM.apiKey : '';
+    if(ffwdme.options.OSRM && ffwdme.options.OSRM.url) {
+        this.BASE_URL = ffwdme.options.OSRM.url;
+    }
 
     if (options.anchorPoint) {
       this.anchorPoint = options.anchorPoint;
@@ -1621,7 +1624,7 @@ var OSRM = Base.extend({
 
   parse: function(response) {
 
-    if (response.status !== 200) return this.error(response);
+    if (response.status !== 200 && response.status !== 0) return this.error(response);
 
     var routeStruct = { directions: [] };
     routeStruct.summary = {
