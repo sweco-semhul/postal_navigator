@@ -1,5 +1,5 @@
 class PostalNavigator {
-    constructor(firstName, lastName) {
+    constructor() {
 
         ffwdme.on('geoposition:init', function() {
           console.info("Waiting for initial geoposition...");
@@ -13,9 +13,9 @@ class PostalNavigator {
         ffwdme.defaults.imageBaseUrl = '/dist/vendor/ffwdme/components/';
         // setup ffwdme
         ffwdme.initialize({
-          routing: 'GraphHopper',
-          graphHopper: {
-            apiKey: CREDENTIALS.graphHopper
+          routing: 'OSRM',
+          osrm: {
+            apiKey: ''
           }
         });
 
@@ -57,6 +57,13 @@ class PostalNavigator {
           });
           $('#views-toggle, #nav-info-trigger, #routing-trigger').removeClass('hidden');
         }
+
+
+
+        var route = new ffwdme.routingService({
+          start: { lat: 59.3280756, lng: 18.0158625 },
+          dest:  { lat: 59.326242, lng: 17.847463 }
+        }).fetch();
     }
 
     setupCustomLayer() {
