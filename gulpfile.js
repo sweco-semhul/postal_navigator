@@ -11,7 +11,9 @@ var reload = browserSync.reload;
 var proxyMiddleware = require('http-proxy-middleware');
 
 var proxies = [
-  proxyMiddleware('/pgm', {target: 'http://ext-test.pgm.postnord.com', pathRewrite: { '^/pgm': '', ws: true }  })
+  proxyMiddleware('/pgm', {target: 'http://ext-test.pgm.postnord.com', pathRewrite: { '^/pgm': '', ws: true }  }),
+  proxyMiddleware('/osrm', {target: 'http://10.250.250.14:5000', pathRewrite: { '^/osrm': '', ws: true }  })
+
 ];
 
 var config = {
@@ -45,6 +47,7 @@ function bundle() {
 
 gulp.task('build-persistent', ['clean'], function() {
   gulp.src('src/vendor/**').pipe(gulp.dest(config.outputDir+ '/vendor'))
+  gulp.src('src/static/**').pipe(gulp.dest(config.outputDir+ '/static'))
   return bundle();
 });
 
