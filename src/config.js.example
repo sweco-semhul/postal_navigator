@@ -1,0 +1,5 @@
+const CONFIG = {
+  ROUTE_EXAMPLE: 'static/data/13757_ok.xml',
+  OSRM_SERVICE_URL    : '',
+  MAPBOX_ACCESS_TOKEN : ''
+};

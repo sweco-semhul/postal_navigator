@@ -46,8 +46,9 @@ function bundle() {
 }
 
 gulp.task('build-persistent', ['clean'], function() {
-  gulp.src('src/vendor/**').pipe(gulp.dest(config.outputDir+ '/vendor'))
-  gulp.src('src/static/**').pipe(gulp.dest(config.outputDir+ '/static'))
+  gulp.src('src/vendor/**').pipe(gulp.dest(config.outputDir+ '/vendor'));
+  gulp.src('src/static/**').pipe(gulp.dest(config.outputDir+ '/static'));
+  gulp.src('src/config.js').pipe(gulp.dest(config.outputDir));
   return bundle();
 });
 
