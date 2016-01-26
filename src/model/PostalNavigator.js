@@ -1,3 +1,4 @@
+import {RouteRenderer} from './RouteRenderer';
 import {xhr} from '../utils/xhr';
 import {routeParser} from '../utils/routeParser';
 import {geoJSON} from '../utils/geoJSON';
@@ -15,7 +16,7 @@ class PostalNavigator {
             console.log(route);
             route.routeItems[0].stopPoint.easting
             // Try to do some routing
-            this.renderRoute(window.widgets.map.map, route)
+            this.routeRenderer.render(route)
             var routeService = new ffwdme.routingService({
               start: position.point,
               dest:  { lat: route.routeItems[1].stopPoint.northing, lng: route.routeItems[1].stopPoint.easting }
@@ -25,6 +26,8 @@ class PostalNavigator {
 
       });
     this.initFFWDME(config);
+
+    this.routeRenderer = new RouteRenderer({ map: window.widgets.map.map });
   }
 
   initFFWDME(config) {
@@ -138,41 +141,6 @@ class PostalNavigator {
     var tilePath = "http://localhost:3000/pgm/tms/osm/sweden/sweden/{z}/{x}/{y}.pbf";
     var tileJSON = {"basename":"sweden","id":"world","filesize":"65794689024","center":[21.7969,34.6694,3],"description":"Open Streets v1.0","format":"pbf","maxzoom":14,"minzoom":0,"name":"Open Streets v1.0","bounds":[10.4920778,55.0331192,24.2776819,69.1599699],"maskLevel":"8","vector_layers":[{"id":"landuse","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","class":"String","type":"String"}},{"id":"waterway","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","type":"String","class":"String"}},{"id":"water","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number"}},{"id":"aeroway","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","type":"String"}},{"id":"barrier_line","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","class":"String"}},{"id":"building","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number"}},{"id":"landuse_overlay","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","class":"String"}},{"id":"tunnel","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","class":"String","type":"String","layer":"Number","oneway":"Number"}},{"id":"road","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","type":"String","class":"String","oneway":"Number"}},{"id":"bridge","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","class":"String","type":"String","layer":"Number","oneway":"Number"}},{"id":"admin","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","admin_level":"Number","disputed":"Number","maritime":"Number"}},{"id":"country_label","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","code":"String","name":"String","name_en":"String","name_es":"String","name_fr":"String","name_de":"String","name_ru":"String","name_zh":"String","scalerank":"Number"}},{"id":"marine_label","description":"","minzoom":0,"maxzoom":22,"fields":{"name":"String","name_en":"String","name_es":"String","name_fr":"String","name_de":"String","name_ru":"String","name_zh":"String","placement":"String","labelrank":"Number"}},{"id":"state_label","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","abbr":"String","area":"Number","name":"String","name_de":"String","name_en":"String","name_es":"String","name_fr":"String","name_ru":"String","name_zh":"String"}},{"id":"place_label","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","name":"String","name_en":"String","name_es":"String","name_fr":"String","name_de":"String","name_ru":"String","name_zh":"String","type":"String","capital":"String","ldir":"String","scalerank":"String","localrank":"Number"}},{"id":"water_label","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","name":"String","area":"Number","name_en":"String","name_es":"String","name_fr":"String","name_de":"String","name_ru":"String","name_zh":"String"}},{"id":"poi_label","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","ref":"String","website":"String","network":"String","address":"String","name":"String","name_en":"String","name_es":"String","name_fr":"String","name_de":"String","name_ru":"String","name_zh":"String","type":"String","scalerank":"Number","localrank":"Number","maki":"String"}},{"id":"road_label","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","name":"String","name_en":"String","name_es":"String","name_fr":"String","name_de":"String","name_ru":"String","name_zh":"String","ref":"String","reflen":"Number","len":"Number","class":"String","shield":"String","localrank":"Number"}},{"id":"waterway_label","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","name":"String","name_en":"String","name_es":"String","name_fr":"String","name_de":"String","name_ru":"String","name_zh":"String","type":"String","class":"String"}},{"id":"housenum_label","description":"","minzoom":0,"maxzoom":22,"fields":{"osm_id":"Number","house_num":"String"}}],"attribution":"&copy; OpenStreetMap contributors","type":"baselayer","tiles":[tilePath],"tilejson":"2.0.0"};;
     return initLayer(tileJSON);
-  }
-
-
-
-  renderRoute(map, route) {
-
-    var name = 'route_stop_points';
-    map.addSource(name, {
-      "type": "geojson",
-      "data": geoJSON.toPointFeatureCollection(route.routeItems, function(feature) { return [feature.stopPoint.easting, feature.stopPoint.northing]})
-    });
-    map.addLayer({
-        "id": name + '_circle',
-        "type": "circle",
-        "source": name,
-        "paint": {
-            "circle-color": "#336699",
-            "circle-radius": 15
-        }
-    });
-    map.addLayer({
-        "id": name + '_text',
-        "type": "symbol",
-        "source": name,
-        "layout": {
-          "text-field": "{order}",
-          "text-size": 20,
-          "text-allow-overlap": true
-        },
-        "paint": {
-          "text-color": "#fff",
-          "text-halo-color": "#fff",
-          "text-halo-width": 0.5
-        }
-    })
   }
 
   tryGetUrlParams(extend, params) {
