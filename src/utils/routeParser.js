@@ -1,8 +1,4 @@
-class RouteParser {
-
-  constructor(config) {
-    this.config = config;
-  }
+const routeParser = {
 
   parse(xmlStr) {
     console.debug('Trying to pare route');
@@ -37,12 +33,11 @@ class RouteParser {
       fulfill({
         name: this.getText(route,'name'),
         type: this.getText(route,'type'),
-        routeItems: routeItems,
-        coordinates: routeItems.map(function(item) { return [item.stopPoint.easting, item.stopPoint.northing, item.order]})
+        routeItems: routeItems
       });
     }.bind(this));
 
-  }
+  },
 
   toXMLDoc(xmlStr) {
     var xmlDoc;
@@ -57,16 +52,16 @@ class RouteParser {
       xmlDoc.loadXML(xmlStr);
     }
     return xmlDoc;
-  }
+  },
 
   getFloat(item, name) {
     return parseFloat(this.getText(item, name));
-  }
+  },
 
   getText(item, name) {
     var elements = item.getElementsByTagName(name);
     return elements.length > 0 ? elements[0].textContent : '';
-  }
+  },
 
   // Simple sort of object by property
   sortBy(obj, sortParam) {
@@ -82,4 +77,4 @@ class RouteParser {
   }
 }
 
-export {RouteParser}
+export {routeParser}

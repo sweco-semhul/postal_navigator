@@ -1,8 +1,8 @@
-class XHR {
+const xhr = {
 
   get(options) {
     return this._request(options);
-  }
+  },
 
   _request(options) {
     return new Promise(function (onSuccess, onError) {
@@ -22,7 +22,7 @@ class XHR {
       xmlhttp.open(method, options.url, true);
       xmlhttp.send();
     }.bind(this));
-  }
+  },
 
   _parseResponse(xmlhttp) {
     var contentType = xmlhttp.getResponseHeader('Content-Type');
@@ -38,4 +38,4 @@ class XHR {
   }
 }
 
-export {XHR}
+export {xhr}

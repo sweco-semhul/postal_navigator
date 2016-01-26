@@ -1,30 +1,29 @@
-import {XHR} from '../utils/XHR';
-import {RouteParser} from '../utils/RouteParser';
+import {xhr} from '../utils/xhr';
+import {routeParser} from '../utils/routeParser';
 
 class PostalNavigator {
-    constructor() {
+  constructor(config) {
+    this.tryGetUrlParams(config, ['OSRM_SERVICE_URL', 'MAPBOX_ACCESS_TOKEN']);
 
+    ffwdme.on('geoposition:update', position => {
 
-
-      var routeParser = new RouteParser(),
-          xhr = new XHR();
-
-      ffwdme.on('geoposition:update', function(position) {
-
-        // Get route
-        xhr.get({ url: 'static/data/13757_ok.xml'})
-          .then((data) => {
-            routeParser.parse(data).then((route) => {
-              console.log(route);
-              route.routeItems[0].stopPoint.easting
-              // Try to do some routing
-              var route = new ffwdme.routingService({
-                start: position.point,
-                dest:  { lat: route.routeItems[1].stopPoint.northing, lng: route.routeItems[1].stopPoint.easting }
-              }).fetch();
-            })
+      // Get route
+      xhr.get({ url: config.ROUTE_EXAMPLE})
+        .then(data => {
+          routeParser.parse(data).then(route => {
+            console.log(route);
+            route.routeItems[0].stopPoint.easting
+            // Try to do some routing
+            var routeService = new ffwdme.routingService({
+              start: position.point,
+              dest:  { lat: route.routeItems[1].stopPoint.northing, lng: route.routeItems[1].stopPoint.easting }
+            }).fetch();
           })
+        })
 
+      });
+    this.initFFWDME(config);
+  }
         });
       this.initFFWDME();
     }
