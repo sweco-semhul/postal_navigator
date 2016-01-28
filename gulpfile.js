@@ -3,12 +3,13 @@ var fs = require('fs');
 var browserify = require('browserify');
 var watchify = require('watchify');
 var babelify = require('babelify');
-var rimraf = require('rimraf');
+var del = require('del');
 var source = require('vinyl-source-stream');
 var _ = require('lodash');
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var proxyMiddleware = require('http-proxy-middleware');
+var runSequence = require('run-sequence');
 
 var proxies = [
   proxyMiddleware('/pgm', {target: 'http://ext-test.pgm.postnord.com', pathRewrite: { '^/pgm': '', ws: true }  }),
@@ -24,7 +25,7 @@ var config = {
 
 // clean the output directory
 gulp.task('clean', function(cb){
-    rimraf(config.outputDir, cb);
+  return del(config.outputDir);
 });
 
 var bundler;
@@ -45,11 +46,23 @@ function bundle() {
     .pipe(reload({ stream: true }));
 }
 
-gulp.task('build-persistent', ['clean'], function() {
-  gulp.src('src/vendor/**').pipe(gulp.dest(config.outputDir+ '/vendor'));
-  gulp.src('src/static/**').pipe(gulp.dest(config.outputDir+ '/static'));
-  gulp.src('src/config.js').pipe(gulp.dest(config.outputDir));
-  return bundle();
+gulp.task('copy-vendors', function() {
+  return gulp.src('./src/vendor/**').pipe(gulp.dest(config.outputDir+ '/vendor/'));
+});
+
+gulp.task('copy-static', function() {
+  return gulp.src('./src/static/**').pipe(gulp.dest(config.outputDir+ '/static/'));
+});
+
+gulp.task('copy-config', function() {
+  return gulp.src('./src/config.js').pipe(gulp.dest(config.outputDir));
+});
+
+gulp.task('build-persistent', function(cb) {
+  runSequence('clean', ['copy-vendors', 'copy-static', 'copy-config'], function() {
+    bundle();
+    cb();
+  });
 });
 
 gulp.task('build', ['build-persistent'], function() {
@@ -71,3 +84,5 @@ gulp.task('watch', ['build-persistent', 'serve'], function() {
     gulp.start('build-persistent')
   });
 });
+
+gulp.task('default', ['watch']);
