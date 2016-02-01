@@ -1,5 +1,5 @@
 const CONFIG = {
   ROUTE_EXAMPLE: 'static/data/13757_ok.xml',
-  OSRM_SERVICE_URL    : '',
-  MAPBOX_ACCESS_TOKEN : ''
+  OSRM_SERVICE_URL: 'https://router.project-osrm.org',
+  MAPBOX_ACCESS_TOKEN : 'ADD_YOUR_MAPBOX_API_ACCESS_TOKEN_HERE'
 };
