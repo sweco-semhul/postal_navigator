@@ -1543,9 +1543,9 @@ var OSRM = Base.extend({
     this.base(options);
     this.bindAll(this, 'parse', 'error');
 
-    this.apiKey = ffwdme.options.OSRM ? ffwdme.options.OSRM.apiKey : '';
-    if(ffwdme.options.OSRM && ffwdme.options.OSRM.url) {
-        this.BASE_URL = ffwdme.options.OSRM.url;
+    if(ffwdme.options.OSRM) {
+      this.apiKey = ffwdme.options.OSRM.apiKey || '';
+      this.BASE_URL = ffwdme.options.OSRM.url || this.BASE_URL;
     }
 
     if (options.anchorPoint) {

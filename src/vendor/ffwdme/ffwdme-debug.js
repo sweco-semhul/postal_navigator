@@ -291,6 +291,7 @@ var Player = ffwdme.Class.extend({
 
     if (this.currentPoint && nextPoint) {
       var timeToWait = nextPoint.timestampRelative - this.currentPoint.timestampRelative;
+      timeToWait = 500;
       var data = {
         geoposition: this.currentPoint,
         point: new ffwdme.LatLng(this.currentPoint.coords.latitude, this.currentPoint.coords.longitude)
@@ -570,6 +571,7 @@ module.exports = Track;
 
 },{}],8:[function(require,module,exports){
 var GeoProviderPlayerLocal = require('./geoprovider/player_local');
+var GeoProviderPlayer = require('./geoprovider/player');
 var GeoProviderRecorder = require('./geoprovider/recorder');
 var ComponentGeolocation = require('./components/geolocation');
 var ComponentNavInfo = require('./components/nav_info');
@@ -579,6 +581,7 @@ var ComponentRouting = require('./components/routing');
   ffwdme.debug = {
     geoprovider: {
       PlayerLocal: GeoProviderPlayerLocal,
+      Player: GeoProviderPlayer,
       Recorder: GeoProviderRecorder
     },
     components: {
@@ -589,4 +592,4 @@ var ComponentRouting = require('./components/routing');
   };
 })(ffwdme);
 
-},{"./components/geolocation":1,"./components/nav_info":2,"./components/routing":3,"./geoprovider/player_local":5,"./geoprovider/recorder":6}]},{},[8]);
+},{"./components/geolocation":1,"./components/nav_info":2,"./components/routing":3,"./geoprovider/player":4,"./geoprovider/player_local":5,"./geoprovider/recorder":6}]},{},[8]);
