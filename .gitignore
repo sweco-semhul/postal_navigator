@@ -1,7 +1,6 @@
 .DS_Store
-dist
 node_modules
-src/config.js
+config.js
 src/vendor/ffwdme/demo
 src/vendor/ffwdme/demo_mapboxgljs
 src/vendor/ffwdme/posten_test
