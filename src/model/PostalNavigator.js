@@ -5,29 +5,127 @@ import {geoJSON} from '../utils/geoJSON';
 
 class PostalNavigator {
   constructor(config) {
-    this.tryGetUrlParams(config, ['OSRM_SERVICE_URL', 'MAPBOX_ACCESS_TOKEN']);
+    this.tryGetUrlParams(config, ['OSRM_SERVICE_URL', 'MAPBOX_ACCESS_TOKEN', 'ROUTING_SERVICE', 'GRAPHHOPPER_ACCESS_TOKEN']);
+    this.initFFWDME(config);
+    this.routeRenderer = new RouteRenderer({ map: window.widgets.map.map });
 
-    ffwdme.on('geoposition:update', position => {
 
-      // Get route
-      xhr.get({ url: config.ROUTE_EXAMPLE})
+    window.widgets.map.map.on('style.load', () => {
+      xhr.get({ url: config.ROUTE_EXAMPLE || 'static/data/13757_ok.xml'})
         .then(data => {
           routeParser.parse(data).then(route => {
             console.log(route);
             route.routeItems[0].stopPoint.easting
             // Try to do some routing
             this.routeRenderer.render(route)
-            var routeService = new ffwdme.routingService({
-              start: position.point,
-              dest:  { lat: route.routeItems[1].stopPoint.northing, lng: route.routeItems[1].stopPoint.easting }
-            }).fetch();
+            this.simulate(route);
           })
         })
+    });/*
+    ffwdme.on('geoposition:update', position => {
+      console.log(position);
+      // Get route
+      var routeService = new ffwdme.routingService({
+        start: position.point,
+        dest:  { lat: route.routeItems[1].stopPoint.northing, lng: route.routeItems[1].stopPoint.easting }
+      }).fetch();
 
-      });
-    this.initFFWDME(config);
+    });*/
+  }
 
-    this.routeRenderer = new RouteRenderer({ map: window.widgets.map.map });
+  simulate(route) {
+    var routeItemIndex = 1;
+    var thePlayer = {};
+    function doRoute() {
+
+
+      var start = { lat: route.routeItems[routeItemIndex].stopPoint.northing, lng: route.routeItems[routeItemIndex].stopPoint.easting };
+      var dest = { lat: route.routeItems[routeItemIndex+1].stopPoint.northing, lng: route.routeItems[routeItemIndex+1].stopPoint.easting };
+
+      console.log('FETCHING NEW ROUTE');
+      console.log('FROM: ',route.routeItems[routeItemIndex], 'TO:', route.routeItems[routeItemIndex+1]);
+      console.log('DISTANCE', ffwdme.utils.Geo.distance(start, dest));
+
+      thePlayer.player = new ffwdme.debug.geoprovider.Player();
+
+      new ffwdme.routingService({
+        start: start,
+        dest:  dest
+      }).fetch();
+    }
+
+    ffwdme.on('geoposition:update', e => {
+      console.log('GEO PSITION UPDATE', e.point);
+    });
+    ffwdme.on('navigation:onroute', e => {
+      console.log('NAVINFO:', e.navInfo.arrived, e.navInfo.distanceToDestination, e.navInfo.distanceToNextDirection);
+      if(e.navInfo.arrived || (e.navInfo.distanceToDestination <= 0 && e.navInfo.distanceToNextDirection <= 0)) {
+/* !TODO Some bug in the ffwdme navigator causes the navigator to get crazy on changing to new track
+          thePlayer.player.stop();
+          delete thePlayer.player;
+          delete track.points;
+          routeItemIndex++;
+          doRoute();
+*/
+      }
+    });
+
+    ffwdme.on('reroutecalculation:success', resp => {
+      console.log('reroute', resp);
+    });
+
+    ffwdme.on('routecalculation:success', response => {
+
+      var track = { points: [] };
+      response.route.directions.forEach((direction, i) => {
+        direction.path.forEach((point, i) => {
+          var nextPoint = i+1 < direction.path.length ? direction.path[i+1] : direction.path[i];
+          track.points.push({
+            coords: {
+              latitude: point.lat,
+              longitude: point.lng,
+              speed: 20,
+              heading: this.bearing(point, nextPoint)
+            },
+            timestampRelative: (i*1000) // ffwdme.utils.Geo.distance()
+          });
+        })
+      })
+      console.log('ROUTE CALCULATED', response.route.directions.length, track.points.length, response.route.directions, track);
+      thePlayer.player.track = track;
+      thePlayer.player.start();
+    });
+
+
+    doRoute();
+
+  }
+
+
+
+  bearing(p1, p2) {
+    function radians(n) {
+      return n * (Math.PI / 180);
+    }
+    function degrees(n) {
+      return n * (180 / Math.PI);
+    }
+
+    var startLat = radians(p1.northing || p1.latutide || p1.lat),
+    startLong = radians(p1.easting || p1.longitude || p1.lng),
+    endLat = radians(p2.northing || p2.latutide || p2.lat),
+    endLong = radians(p2.easting || p2.longitude || p2.lng),
+    dLong = endLong - startLong;
+
+    var dPhi = Math.log(Math.tan(endLat/2.0+Math.PI/4.0)/Math.tan(startLat/2.0+Math.PI/4.0));
+    if (Math.abs(dLong) > Math.PI){
+      if (dLong > 0.0)
+         dLong = -(2.0 * Math.PI - dLong);
+      else
+         dLong = (2.0 * Math.PI + dLong);
+    }
+
+    return (degrees(Math.atan2(dLong, dPhi)) + 360.0) % 360.0;
   }
 
   initFFWDME(config) {
@@ -43,7 +141,10 @@ class PostalNavigator {
     ffwdme.defaults.imageBaseUrl = '/dist/vendor/ffwdme/components/';
     // setup ffwdme
     ffwdme.initialize({
-      routing: 'OSRM',
+      routing: config.ROUTING_SERVICE || 'GraphHopper',
+      graphHopper: {
+        apiKey: config.GRAPHHOPPER_ACCESS_TOKEN
+      },
       OSRM: {
         url: config.OSRM_SERVICE_URL,
         apiKey: ''
