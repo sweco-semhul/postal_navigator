@@ -138,7 +138,7 @@ class PostalNavigator {
       $('#loader').remove();
     });
 
-    ffwdme.defaults.imageBaseUrl = '/dist/vendor/ffwdme/components/';
+    ffwdme.defaults.imageBaseUrl = 'dist/vendor/ffwdme/components/';
     // setup ffwdme
     ffwdme.initialize({
       routing: config.ROUTING_SERVICE || 'GraphHopper',
